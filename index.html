@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>FluentPath — English Learning Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0d1117;
+  --surface: #161b22;
+  --surface2: #21262d;
+  --surface3: #30363d;
+  --border: rgba(255,255,255,0.07);
+  --text: #e6edf3;
+  --muted: #7d8590;
+  --accent: #58a6ff;
+  --accent-dim: rgba(88,166,255,0.1);
+  --green: #3fb950;
+  --green-dim: rgba(63,185,80,0.12);
+  --yellow: #d29922;
+  --yellow-dim: rgba(210,153,34,0.12);
+  --red: #f85149;
+  --red-dim: rgba(248,81,73,0.12);
+  --purple: #bc8cff;
+  --purple-dim: rgba(188,140,255,0.12);
+  --orange: #f0883e;
+  --orange-dim: rgba(240,136,62,0.12);
+  --teal: #39d353;
+  --phase1: #58a6ff;
+  --phase2: #bc8cff;
+  --phase3: #3fb950;
+  --phase4: #f0883e;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+
+/* HEADER */
+.hero {
+  background: linear-gradient(135deg, #0d1117 0%, #1a1f2e 50%, #0d1117 100%);
+  border-bottom: 1px solid var(--border);
+  padding: 2.5rem 2rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(ellipse 60% 80% at 80% 20%, rgba(88,166,255,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse 40% 60% at 20% 80%, rgba(188,140,255,0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+.hero-inner { max-width: 1200px; margin: 0 auto; position: relative; }
+.hero-top { display: flex; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+.logo { display: flex; align-items: center; gap: 0.75rem; }
+.logo-icon { width: 44px; height: 44px; background: linear-gradient(135deg, var(--accent), var(--purple)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+.logo-text { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg, var(--accent), var(--purple)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.logo-sub { font-size: 0.72rem; color: var(--muted); font-weight: 400; letter-spacing: 0.12em; text-transform: uppercase; display: block; margin-top: -2px; }
+
+.hero-stats { display: flex; gap: 1.25rem; flex-wrap: wrap; }
+.hstat {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  padding: 0.75rem 1.25rem; text-align: center; min-width: 90px;
+}
+.hstat-val { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: var(--accent); line-height: 1; }
+.hstat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; margin-top: 2px; }
+
+.hero-progress { margin-top: 1.5rem; }
+.progress-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.progress-label-text { font-size: 0.8rem; color: var(--muted); }
+.progress-label-pct { font-size: 0.9rem; font-weight: 600; color: var(--accent); }
+.progress-bar { height: 8px; background: var(--surface2); border-radius: 100px; overflow: hidden; }
+.progress-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--purple), var(--green)); border-radius: 100px; transition: width 1s ease; }
+
+.phase-pills { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem; }
+.phase-pill { padding: 0.3rem 0.9rem; border-radius: 20px; font-size: 0.72rem; font-weight: 600; letter-spacing: 0.05em; cursor: pointer; border: 1px solid transparent; transition: all 0.2s; }
+.phase-pill.p1 { background: rgba(88,166,255,0.1); color: var(--phase1); border-color: rgba(88,166,255,0.25); }
+.phase-pill.p2 { background: rgba(188,140,255,0.1); color: var(--phase2); border-color: rgba(188,140,255,0.25); }
+.phase-pill.p3 { background: rgba(63,185,80,0.1); color: var(--phase3); border-color: rgba(63,185,80,0.25); }
+.phase-pill.p4 { background: rgba(240,136,62,0.1); color: var(--phase4); border-color: rgba(240,136,62,0.25); }
+.phase-pill:hover { opacity: 0.8; transform: translateY(-1px); }
+
+/* FILTERS */
+.filters {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0.9rem 2rem; display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center;
+  position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px);
+}
+.filter-sep { width: 1px; height: 20px; background: var(--border); margin: 0 0.25rem; }
+.fl { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; }
+.fbtn {
+  padding: 0.28rem 0.75rem; border-radius: 20px; font-size: 0.76rem; font-weight: 500;
+  background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+  cursor: pointer; transition: all 0.2s; font-family: 'Outfit', sans-serif;
+}
+.fbtn:hover { color: var(--text); border-color: var(--accent); }
+.fbtn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+.search-box {
+  padding: 0.32rem 0.9rem; border-radius: 20px; font-size: 0.8rem;
+  background: var(--surface2); border: 1px solid var(--border); color: var(--text);
+  outline: none; transition: border-color 0.2s; width: 200px; font-family: 'Outfit', sans-serif;
+  margin-left: auto;
+}
+.search-box:focus { border-color: var(--accent); }
+.search-box::placeholder { color: var(--muted); }
+
+/* CARDS */
+.main { max-width: 1200px; margin: 0 auto; padding: 1.5rem 2rem; }
+.phase-group { margin-bottom: 2.5rem; }
+.phase-header {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.25rem; border-radius: 14px;
+  border: 1px solid var(--border); margin-bottom: 1rem; cursor: pointer;
+  transition: all 0.2s; background: var(--surface);
+}
+.phase-header:hover { border-color: var(--accent); }
+.phase-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+.phase-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; font-weight: 700; }
+.phase-subtitle { font-size: 0.76rem; color: var(--muted); margin-top: 1px; }
+.phase-days { font-size: 0.72rem; color: var(--muted); background: var(--surface2); padding: 0.2rem 0.6rem; border-radius: 6px; border: 1px solid var(--border); white-space: nowrap; }
+.phase-prog-bar { flex: 1; max-width: 140px; height: 5px; background: var(--surface2); border-radius: 100px; overflow: hidden; margin-left: auto; }
+.phase-prog-fill { height: 100%; border-radius: 100px; transition: width 0.6s ease; }
+.phase-count { font-size: 0.75rem; color: var(--muted); white-space: nowrap; margin-left: 0.5rem; }
+.phase-toggle { color: var(--muted); font-size: 0.7rem; transition: transform 0.2s; }
+.phase-group.collapsed .phase-toggle { transform: rotate(-90deg); }
+.phase-group.collapsed .tasks-list { display: none; }
+
+/* TASK CARDS */
+.task-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; margin-bottom: 0.6rem; overflow: hidden;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.task-card:hover { border-color: rgba(88,166,255,0.25); box-shadow: 0 2px 12px rgba(0,0,0,0.3); }
+.task-card.t-done { background: rgba(63,185,80,0.04); border-color: rgba(63,185,80,0.2); }
+.task-card.t-done .task-title { opacity: 0.6; text-decoration: line-through; text-decoration-color: var(--green); }
+
+.task-top { display: flex; align-items: flex-start; gap: 0.85rem; padding: 0.9rem 1.1rem; cursor: pointer; }
+.task-num { color: var(--muted); font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; min-width: 28px; padding-top: 3px; flex-shrink: 0; }
+.task-main { flex: 1; min-width: 0; }
+.task-day { font-size: 0.68rem; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 2px; }
+.task-title { font-size: 0.9rem; font-weight: 500; line-height: 1.4; }
+.task-badges { display: flex; gap: 0.35rem; flex-wrap: wrap; margin-top: 0.4rem; align-items: center; }
+.task-expand { color: var(--muted); font-size: 0.7rem; transition: transform 0.2s; padding-top: 4px; flex-shrink: 0; }
+.task-card.expanded .task-expand { transform: rotate(180deg); }
+
+.badge { display: inline-block; padding: 0.15rem 0.5rem; border-radius: 5px; font-size: 0.66rem; font-weight: 600; white-space: nowrap; }
+.badge-grammar { background: rgba(88,166,255,0.1); color: var(--accent); }
+.badge-vocab { background: rgba(188,140,255,0.1); color: var(--purple); }
+.badge-speaking { background: rgba(240,136,62,0.1); color: var(--orange); }
+.badge-listening { background: rgba(63,185,80,0.1); color: var(--green); }
+.badge-reading { background: rgba(210,153,34,0.12); color: var(--yellow); }
+.badge-writing { background: rgba(248,81,73,0.1); color: var(--red); }
+.badge-daily { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+.badge-mins { background: rgba(57,211,83,0.08); color: #39d353; font-family: 'JetBrains Mono', monospace; }
+
+/* TASK BODY */
+.task-body { display: none; padding: 0 1.1rem 1rem 2.9rem; }
+.task-card.expanded .task-body { display: block; }
+.task-desc {
+  background: var(--surface2); border-radius: 8px; padding: 0.75rem 1rem;
+  font-size: 0.82rem; color: var(--muted); line-height: 1.65; margin-bottom: 0.75rem;
+  border-left: 2px solid var(--accent);
+}
+.task-resources { margin-bottom: 0.75rem; }
+.res-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-weight: 600; margin-bottom: 0.4rem; }
+.res-links { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.res-link {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 7px; padding: 0.28rem 0.65rem; font-size: 0.76rem; color: var(--accent);
+  text-decoration: none; transition: all 0.2s; white-space: nowrap;
+}
+.res-link:hover { border-color: var(--accent); background: var(--accent-dim); }
+.res-link .rtype { font-size: 0.62rem; background: var(--surface3); color: var(--muted); padding: 0.1rem 0.3rem; border-radius: 4px; font-weight: 600; }
+
+.task-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+.status-sel {
+  padding: 0.25rem 0.65rem; border-radius: 8px; font-size: 0.75rem; font-weight: 500;
+  border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+  cursor: pointer; outline: none; font-family: 'Outfit', sans-serif;
+}
+.status-sel.s-done { background: var(--green-dim); color: var(--green); border-color: rgba(63,185,80,0.3); }
+.status-sel.s-prog { background: var(--yellow-dim); color: var(--yellow); border-color: rgba(210,153,34,0.3); }
+.status-sel.s-skip { background: var(--red-dim); color: var(--red); border-color: rgba(248,81,73,0.3); }
+
+.streak-btns { display: flex; gap: 0.3rem; }
+.streak-btn {
+  padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--muted); font-size: 0.68rem; font-weight: 700;
+  cursor: pointer; transition: all 0.2s; font-family: 'Outfit', sans-serif;
+}
+.streak-btn:hover { border-color: var(--accent); color: var(--accent); }
+.streak-btn.s-done { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+
+.no-results { text-align: center; padding: 4rem 2rem; color: var(--muted); }
+.no-results .emoji { font-size: 3rem; display: block; margin-bottom: 1rem; }
+
+/* DAILY HABIT BANNER */
+.habit-banner {
+  background: linear-gradient(135deg, rgba(88,166,255,0.08), rgba(188,140,255,0.08));
+  border: 1px solid rgba(88,166,255,0.15); border-radius: 14px;
+  padding: 1.25rem 1.5rem; margin-bottom: 2rem; display: flex; align-items: flex-start; gap: 1rem;
+  flex-wrap: wrap;
+}
+.habit-icon { font-size: 1.8rem; flex-shrink: 0; }
+.habit-title { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--accent); margin-bottom: 0.3rem; }
+.habit-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.habit-item {
+  font-size: 0.76rem; color: var(--muted);
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 0.25rem 0.65rem;
+  display: flex; align-items: center; gap: 0.35rem;
+}
+.habit-item::before { content: '•'; color: var(--accent); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--surface); }
+::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+@media(max-width:640px){
+  .hero{padding:1.5rem 1rem 1.25rem;}
+  .filters{padding:0.75rem 1rem;}
+  .search-box{width:100%;margin-left:0;}
+  .main{padding:1rem;}
+  .task-badges{display:none;}
+  .hero-stats{gap:0.6rem;}
+  .hstat{min-width:70px;padding:0.5rem 0.75rem;}
+  .hstat-val{font-size:1.2rem;}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-inner">
+    <div class="hero-top">
+      <div class="logo">
+        <div class="logo-icon">🗣️</div>
+        <div>
+          <div class="logo-text">FluentPath</div>
+          <span class="logo-sub">60-Day English Mastery</span>
+        </div>
+      </div>
+      <div class="hero-stats">
+        <div class="hstat"><div class="hstat-val" id="done-count">0</div><div class="hstat-label">Done</div></div>
+        <div class="hstat"><div class="hstat-val" id="streak-count">0</div><div class="hstat-label">Streak 🔥</div></div>
+        <div class="hstat"><div class="hstat-val" id="total-count">0</div><div class="hstat-label">Tasks</div></div>
+        <div class="hstat"><div class="hstat-val" id="pct-text">0%</div><div class="hstat-label">Progress</div></div>
+      </div>
+    </div>
+    <div class="hero-progress">
+      <div class="progress-label">
+        <span class="progress-label-text">Overall Progress — Beginner → Pro</span>
+        <span class="progress-label-pct" id="pct-fill-text">0%</span>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="main-progress" style="width:0%"></div></div>
+    </div>
+    <div class="phase-pills">
+      <span class="phase-pill p1">Phase 1 · Days 1–15 · Foundation</span>
+      <span class="phase-pill p2">Phase 2 · Days 16–30 · Building Fluency</span>
+      <span class="phase-pill p3">Phase 3 · Days 31–45 · Speaking Confidence</span>
+      <span class="phase-pill p4">Phase 4 · Days 46–60 · Native-like Expression</span>
+    </div>
+  </div>
+</div>
+
+<div class="filters">
+  <span class="fl">Phase:</span>
+  <button class="fbtn active" data-filter="phase" data-value="all">All</button>
+  <button class="fbtn" data-filter="phase" data-value="Phase 1">Phase 1</button>
+  <button class="fbtn" data-filter="phase" data-value="Phase 2">Phase 2</button>
+  <button class="fbtn" data-filter="phase" data-value="Phase 3">Phase 3</button>
+  <button class="fbtn" data-filter="phase" data-value="Phase 4">Phase 4</button>
+  <div class="filter-sep"></div>
+  <span class="fl">Skill:</span>
+  <button class="fbtn active" data-filter="skill" data-value="all">All</button>
+  <button class="fbtn" data-filter="skill" data-value="Grammar">Grammar</button>
+  <button class="fbtn" data-filter="skill" data-value="Vocabulary">Vocabulary</button>
+  <button class="fbtn" data-filter="skill" data-value="Speaking">Speaking</button>
+  <button class="fbtn" data-filter="skill" data-value="Listening">Listening</button>
+  <button class="fbtn" data-filter="skill" data-value="Reading">Reading</button>
+  <button class="fbtn" data-filter="skill" data-value="Writing">Writing</button>
+  <div class="filter-sep"></div>
+  <span class="fl">Status:</span>
+  <button class="fbtn active" data-filter="status" data-value="all">All</button>
+  <button class="fbtn" data-filter="status" data-value="Done">Done</button>
+  <button class="fbtn" data-filter="status" data-value="To Do">To Do</button>
+  <input type="text" class="search-box" id="search" placeholder="🔍 Search tasks..."/>
+</div>
+
+<div class="main">
+  <div class="habit-banner">
+    <div class="habit-icon">⚡</div>
+    <div style="flex:1">
+      <div class="habit-title">Daily Non-Negotiables — Do These Every Single Day</div>
+      <div class="habit-list">
+        <span class="habit-item">10 new words in Anki (15 min)</span>
+        <span class="habit-item">1 English podcast episode (20 min)</span>
+        <span class="habit-item">Write 5 sentences in a journal (10 min)</span>
+        <span class="habit-item">Speak out loud for 5 min (mirror talk)</span>
+        <span class="habit-item">Watch 1 short English YouTube clip (10 min)</span>
+      </div>
+    </div>
+  </div>
+  <div id="cards-container"></div>
+  <div class="no-results" id="no-results" style="display:none"><span class="emoji">🔍</span>No tasks match your filters.</div>
+</div>
+
+<script>
+const TASKS = [
+  // ===== PHASE 1: FOUNDATION (Days 1–15) =====
+  {phase:"Phase 1",day:"Day 1",title:"Understand English sentence structure (SVO)",skill:"Grammar",mins:30,desc:"Learn the basic Subject-Verb-Object pattern. Practice forming 20 simple sentences: 'I eat rice.' / 'She reads books.' This is the backbone of English fluency.",resources:[{label:"Basic English Sentence Structure",url:"https://www.grammarly.com/blog/sentence-structure/",type:"Blog"},{label:"BBC Learning English — Sentences",url:"https://www.bbc.co.uk/learningenglish/english/course/upper-intermediate/unit-1/session-1",type:"Web"},{label:"English Sentence Structure (YouTube)",url:"https://www.youtube.com/watch?v=f7GSOP8NtEs",type:"YT"}]},
+  {phase:"Phase 1",day:"Day 2",title:"Present Simple vs Present Continuous",skill:"Grammar",mins:45,desc:"Learn when to say 'I work' vs 'I am working'. Make 15 pairs of sentences using both tenses. This is one of the most commonly confused grammar points.",resources:[{label:"Present Simple vs Continuous — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/present-simple-present-continuous",type:"Web"},{label:"Emma's ESL — Present Tenses (YouTube)",url:"https://www.youtube.com/watch?v=Xep3_N2RiLQ",type:"YT"},{label:"Grammarly: Present Tenses Guide",url:"https://www.grammarly.com/blog/simple-present/",type:"Blog"}]},
+  {phase:"Phase 1",day:"Day 3",title:"Build your core 500-word vocabulary list",skill:"Vocabulary",mins:40,desc:"Install Anki flashcard app and download a 'Top 500 English Words' deck. Learn the top 50 words today. Vocabulary is the #1 lever for fluency.",resources:[{label:"Anki App — Free Flashcard Tool",url:"https://apps.ankiweb.net/",type:"Tool"},{label:"Top 1000 English Words by Oxford",url:"https://www.oxfordlearnersdictionaries.com/topic/1000-words",type:"Web"},{label:"How to Learn Vocabulary Fast (YouTube)",url:"https://www.youtube.com/watch?v=olqTHJhJkUY",type:"YT"}]},
+  {phase:"Phase 1",day:"Day 4",title:"Master articles: a, an, the, zero article",skill:"Grammar",mins:35,desc:"Articles confuse most learners forever. Study the 4 rules with examples. Practice with the article exercise on British Council. Write 10 sentences using each article type.",resources:[{label:"Articles Guide — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/articles",type:"Web"},{label:"A, An, The — Clear Explanation (YouTube)",url:"https://www.youtube.com/watch?v=BrGz99bwqUE",type:"YT"},{label:"Grammarly Articles Explainer",url:"https://www.grammarly.com/blog/articles/",type:"Blog"}]},
+  {phase:"Phase 1",day:"Day 5",title:"Pronunciation: learn the 44 phonemes of English",skill:"Speaking",mins:40,desc:"English has 26 letters but 44 sounds. Learning phonemes prevents a heavy accent. Focus on 5 sounds your native language doesn't have (e.g., /θ/ 'th', /æ/ 'bat', /ɪ/ 'sit').",resources:[{label:"English Phonetics — Sounds of English",url:"https://www.soundsofenglish.org/pronunciation/",type:"Web"},{label:"44 Phonemes Explained (YouTube)",url:"https://www.youtube.com/watch?v=G3UZXBBa_0g",type:"YT"},{label:"Interactive Phonemic Chart — Cambridge",url:"https://www.cambridge.org/features/phonetics/",type:"Tool"}]},
+  {phase:"Phase 1",day:"Day 6",title:"Listen to a beginner podcast — 30 min active listening",skill:"Listening",mins:30,desc:"'Active listening' means pausing every 2 minutes, repeating what you heard, and noting 5 new words. Don't just let it play. Use 6 Minute English by BBC — transcripts included.",resources:[{label:"BBC 6 Minute English (Beginner)",url:"https://www.bbc.co.uk/learningenglish/english/features/6-minute-english",type:"Podcast"},{label:"ESLPod — English as a Second Language",url:"https://www.eslpod.com/website/",type:"Podcast"},{label:"How to Do Active Listening (YouTube)",url:"https://www.youtube.com/watch?v=1fCkBPUiw3k",type:"YT"}]},
+  {phase:"Phase 1",day:"Day 7",title:"Weekly review + speak for 5 min without stopping",skill:"Speaking",mins:45,desc:"Review all grammar and vocabulary from days 1–6. Then do your first 'fluency drill': set a timer for 5 minutes and speak on any topic WITHOUT stopping. Record yourself. Don't judge — just speak.",resources:[{label:"Fluency Drill Technique Explained",url:"https://www.fluentu.com/blog/english/how-to-practice-speaking-english-alone/",type:"Blog"},{label:"Self-Recording Tips (YouTube)",url:"https://www.youtube.com/watch?v=TnCPuDRtHew",type:"YT"}]},
+  {phase:"Phase 1",day:"Day 8",title:"Past Simple tense — regular and irregular verbs",skill:"Grammar",mins:40,desc:"Learn 50 common irregular verbs (go→went, eat→ate). Write a short paragraph about what you did yesterday using past tense. Irregulars must be memorized — no shortcut.",resources:[{label:"Irregular Verbs List — English Club",url:"https://www.englishclub.com/grammar/verbs-irregular-list.php",type:"Web"},{label:"Past Tense Made Simple (YouTube)",url:"https://www.youtube.com/watch?v=rXAhZ6oNe3k",type:"YT"},{label:"British Council Past Simple Practice",url:"https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar/past-simple",type:"Web"}]},
+  {phase:"Phase 1",day:"Day 9",title:"Prepositions: in, on, at, by, for, with, about",skill:"Grammar",mins:35,desc:"Prepositions are small words with big impact. Learn the 3 most confusing pairs: in/on/at for time and place. Do 20 fill-in-the-blank exercises.",resources:[{label:"Prepositions Guide — Grammarly",url:"https://www.grammarly.com/blog/prepositions/",type:"Blog"},{label:"Prepositions of Time & Place (YouTube)",url:"https://www.youtube.com/watch?v=OCOGOvCkZqI",type:"YT"},{label:"British Council Prepositions Quiz",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/prepositions",type:"Web"}]},
+  {phase:"Phase 1",day:"Day 10",title:"Read a simple English article and summarize it",skill:"Reading",mins:35,desc:"Read a BBC News Easy article or a VOA Learning English article. Write a 5-sentence summary in your own words. Reading + writing together doubles retention.",resources:[{label:"VOA Learning English — Current News",url:"https://learningenglish.voanews.com/",type:"Web"},{label:"Newsela — Leveled Reading Articles",url:"https://newsela.com/",type:"Web"},{label:"BBC Learning English",url:"https://www.bbc.co.uk/learningenglish/",type:"Web"}]},
+  {phase:"Phase 1",day:"Day 11",title:"Learn 20 common collocations (word pairs that go together)",skill:"Vocabulary",mins:30,desc:"Collocations make you sound natural. Examples: 'make a decision' (not 'do a decision'), 'heavy rain', 'take a photo'. Collocations are how native speakers actually think.",resources:[{label:"Top Collocations — English Club",url:"https://www.englishclub.com/vocabulary/collocations.php",type:"Web"},{label:"Collocation Dictionary Online",url:"https://www.ozdic.com/",type:"Tool"},{label:"Learn Collocations Fast (YouTube)",url:"https://www.youtube.com/watch?v=9B4nBk4jI3s",type:"YT"}]},
+  {phase:"Phase 1",day:"Day 12",title:"Shadowing technique — mimic a native speaker",skill:"Speaking",mins:30,desc:"'Shadowing' = listen to a sentence, then immediately repeat it with the same rhythm, stress, and intonation. This is how you get a natural accent. Use a TED-Ed video transcript.",resources:[{label:"How to Shadow English (YouTube)",url:"https://www.youtube.com/watch?v=Hm1Mf7Ob5Gw",type:"YT"},{label:"TED-Ed with Transcripts",url:"https://ed.ted.com/",type:"Web"},{label:"Shadowing Method Explained",url:"https://www.fluentu.com/blog/english/shadowing-language-learning/",type:"Blog"}]},
+  {phase:"Phase 1",day:"Day 13",title:"Write a 150-word paragraph about yourself",skill:"Writing",mins:40,desc:"Introduce yourself: name, background, what you do, your goals, hobbies. Focus on using correct tense and articles. Use Grammarly to check it, then rewrite without looking at corrections.",resources:[{label:"Grammarly Free Writing Checker",url:"https://www.grammarly.com/",type:"Tool"},{label:"How to Write a Self-Introduction",url:"https://www.ef.com/wwen/english-resources/english-grammar/writing-a-self-introduction/",type:"Blog"},{label:"LanguageTool — Alternative to Grammarly",url:"https://languagetool.org/",type:"Tool"}]},
+  {phase:"Phase 1",day:"Day 14",title:"Question formation — Yes/No and Wh- questions",skill:"Grammar",mins:35,desc:"Most learners ask 'You like cricket?' — wrong. Learn inversion: 'Do you like cricket?' Practice forming 20 questions. This is critical for conversation.",resources:[{label:"Question Formation — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/questions",type:"Web"},{label:"How to Form Questions in English (YouTube)",url:"https://www.youtube.com/watch?v=2H4N5HG1K8g",type:"YT"},{label:"Questions Practice Exercises",url:"https://www.perfect-english-grammar.com/question-form-exercises.html",type:"Web"}]},
+  {phase:"Phase 1",day:"Day 15",title:"Phase 1 Review + 10-minute recorded monologue",skill:"Speaking",mins:50,desc:"Review all 14 topics. Then record a 10-minute video of yourself speaking about: introduce yourself, your job, your city, something you did last week. Watch it back with brutal honesty.",resources:[{label:"How to Evaluate Your Own English",url:"https://www.fluentu.com/blog/english/how-to-evaluate-your-english-level/",type:"Blog"},{label:"CEFR Self-Assessment Grid",url:"https://www.coe.int/en/web/portfolio/self-assessment-grid",type:"Web"}]},
+
+  // ===== PHASE 2: BUILDING FLUENCY (Days 16–30) =====
+  {phase:"Phase 2",day:"Day 16",title:"Future tenses: will vs going to vs present continuous",skill:"Grammar",mins:40,desc:"'I will help' (spontaneous decision) vs 'I am going to help' (planned) vs 'I am helping tomorrow' (arranged). These 3 futures confuse even advanced learners. Master with 15 sentences each.",resources:[{label:"Future Tenses — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/will-going-to-or-present-continuous",type:"Web"},{label:"Future Tenses Explained (YouTube)",url:"https://www.youtube.com/watch?v=tDkMi2bR0q4",type:"YT"},{label:"Perfect English Grammar — Future",url:"https://www.perfect-english-grammar.com/future.html",type:"Web"}]},
+  {phase:"Phase 2",day:"Day 17",title:"Modal verbs: can, could, should, must, might, would",skill:"Grammar",mins:45,desc:"Modals are the secret to sounding polite and natural in English. 'Can you help?' vs 'Could you help?' — huge difference in tone. Study all 9 modals with examples of each.",resources:[{label:"Modal Verbs Complete Guide — Grammarly",url:"https://www.grammarly.com/blog/modal-verbs/",type:"Blog"},{label:"Modal Verbs Easy Explanation (YouTube)",url:"https://www.youtube.com/watch?v=Gkp_OMUH1Eg",type:"YT"},{label:"British Council Modal Verbs",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/modal-verbs",type:"Web"}]},
+  {phase:"Phase 2",day:"Day 18",title:"Learn 30 phrasal verbs used in daily conversation",skill:"Vocabulary",mins:40,desc:"Phrasal verbs are the biggest gap between textbook English and real English. 'Give up', 'figure out', 'come up with', 'put off'. Learn 30 essential ones with example sentences.",resources:[{label:"Common Phrasal Verbs List — English Club",url:"https://www.englishclub.com/vocabulary/phrasal-verbs.php",type:"Web"},{label:"50 Most Used Phrasal Verbs (YouTube)",url:"https://www.youtube.com/watch?v=RHdq6Gy_K00",type:"YT"},{label:"Phrasal Verb Machine — Cambridge",url:"https://www.phrasalverbmachine.com/",type:"Tool"}]},
+  {phase:"Phase 2",day:"Day 19",title:"Conversation practice: introduce yourself to a stranger",skill:"Speaking",mins:30,desc:"Join a language exchange on HelloTalk or Tandem. Have one 20-minute conversation. Focus on asking questions and responding naturally. Don't worry about mistakes — connection matters.",resources:[{label:"HelloTalk — Language Exchange App",url:"https://www.hellotalk.com/",type:"App"},{label:"Tandem Language Exchange",url:"https://www.tandem.net/",type:"App"},{label:"Conversation Starter Questions",url:"https://www.fluentu.com/blog/english/english-conversation-topics/",type:"Blog"}]},
+  {phase:"Phase 2",day:"Day 20",title:"Passive voice — when and how to use it",skill:"Grammar",mins:35,desc:"'The report was written by me' vs 'I wrote the report'. Passive is common in formal writing and news. Learn the 4 most common passive tenses and write 10 sentences.",resources:[{label:"Passive Voice Guide — Grammarly",url:"https://www.grammarly.com/blog/passive-voice/",type:"Blog"},{label:"Passive Voice Made Easy (YouTube)",url:"https://www.youtube.com/watch?v=xXFp6RqvBg4",type:"YT"},{label:"British Council Passive Voice Exercises",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/passive-voice",type:"Web"}]},
+  {phase:"Phase 2",day:"Day 21",title:"Watch a sitcom episode with subtitles (no pausing)",skill:"Listening",mins:30,desc:"Watch an episode of 'Friends', 'The Office', or 'Brooklyn Nine-Nine' with English subtitles (NOT your native language). After watching, write 10 phrases you heard that were new to you.",resources:[{label:"Friends Best Learning Episodes",url:"https://www.fluentu.com/blog/english/learn-english-with-friends-tv-show/",type:"Blog"},{label:"Why TV Shows Improve English (YouTube)",url:"https://www.youtube.com/watch?v=pZdaqmKJfkk",type:"YT"}]},
+  {phase:"Phase 2",day:"Day 22",title:"Learn sentence connectors and linking words",skill:"Writing",mins:35,desc:"'However', 'Therefore', 'Moreover', 'Although', 'As a result' — these transform choppy sentences into flowing paragraphs. Write a 200-word paragraph using at least 8 connectors.",resources:[{label:"Linking Words List — English Club",url:"https://www.englishclub.com/writing/linking-words.php",type:"Web"},{label:"Connectors That Improve Your English (YouTube)",url:"https://www.youtube.com/watch?v=cBPJZuDrJ4g",type:"YT"},{label:"Grammarly Transition Words Guide",url:"https://www.grammarly.com/blog/transition-words-phrases/",type:"Blog"}]},
+  {phase:"Phase 2",day:"Day 23",title:"Present Perfect: have + past participle",skill:"Grammar",mins:40,desc:"'I have been to London' (experience, no specific time) vs 'I went to London last year' (specific time). Present Perfect is very common in British English and interviews.",resources:[{label:"Present Perfect Guide — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/present-perfect",type:"Web"},{label:"Present Perfect Finally Explained (YouTube)",url:"https://www.youtube.com/watch?v=eOzF1b3ORPM",type:"YT"},{label:"Present Perfect vs Past Simple",url:"https://www.perfect-english-grammar.com/present-perfect-vs-past-simple.html",type:"Web"}]},
+  {phase:"Phase 2",day:"Day 24",title:"Synonyms and antonyms — expand word range",skill:"Vocabulary",mins:35,desc:"Stop using 'good', 'bad', 'happy', 'sad' all the time. For each basic word, learn 5 stronger synonyms. Instead of 'very good' → 'excellent', 'outstanding', 'exceptional'.",resources:[{label:"Power Thesaurus — Free Online",url:"https://www.powerthesaurus.org/",type:"Tool"},{label:"Word Power Made Easy — Book Summary",url:"https://www.youtube.com/watch?v=g9d1nNXDxPk",type:"YT"},{label:"30 Ways to Say Good in English (YouTube)",url:"https://www.youtube.com/watch?v=r0W49e8c9yk",type:"YT"}]},
+  {phase:"Phase 2",day:"Day 25",title:"Email writing — formal vs informal",skill:"Writing",mins:40,desc:"Write a formal email requesting information, and an informal email to a friend. Learn the difference in opener/closer/tone. Professional email writing is critical for your career.",resources:[{label:"Formal Email Writing Guide — Grammarly",url:"https://www.grammarly.com/blog/formal-email/",type:"Blog"},{label:"How to Write Professional Emails (YouTube)",url:"https://www.youtube.com/watch?v=vOrWXu3Nzds",type:"YT"},{label:"Salutation and Sign-offs Guide",url:"https://www.indeed.com/career-advice/career-development/how-to-start-an-email",type:"Blog"}]},
+  {phase:"Phase 2",day:"Day 26",title:"English stress and rhythm — word stress patterns",skill:"Speaking",mins:35,desc:"In English, stressed syllables are longer, louder, and higher. 'PREsent' (noun) vs 'preSENT' (verb). Wrong stress makes you hard to understand even with perfect grammar.",resources:[{label:"Word Stress — Rachel's English (YouTube)",url:"https://www.youtube.com/watch?v=GVy3bWvIa8I",type:"YT"},{label:"English Word Stress Rules",url:"https://www.soundsofenglish.org/pronunciation/word-stress.html",type:"Web"},{label:"Sentence Stress in English (YouTube)",url:"https://www.youtube.com/watch?v=4a3P9E4Nzl8",type:"YT"}]},
+  {phase:"Phase 2",day:"Day 27",title:"Conditionals: zero, first, second, third",skill:"Grammar",mins:45,desc:"'If I study, I pass' (zero). 'If I study, I will pass' (first). 'If I studied, I would pass' (second — unreal). 'If I had studied, I would have passed' (third — past regret).",resources:[{label:"Conditionals Complete Guide — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/conditionals",type:"Web"},{label:"All 4 Conditionals Explained (YouTube)",url:"https://www.youtube.com/watch?v=T49KeEY9u-A",type:"YT"},{label:"Conditional Exercises — Perfect English Grammar",url:"https://www.perfect-english-grammar.com/conditionals.html",type:"Web"}]},
+  {phase:"Phase 2",day:"Day 28",title:"Listen to English news for 30 min + summarize",skill:"Listening",mins:35,desc:"Listen to BBC World Service or NPR news for 30 minutes. Then write a 100-word summary from memory. News English is formal and clear — great for learning standard pronunciation.",resources:[{label:"BBC Learning English — News",url:"https://www.bbc.co.uk/learningenglish/english/features/news-review",type:"Web"},{label:"VOA Learning English — Video News",url:"https://learningenglish.voanews.com/z/5519",type:"Web"},{label:"NPR Up First — Short Daily Podcast",url:"https://www.npr.org/podcasts/510318/up-first",type:"Podcast"}]},
+  {phase:"Phase 2",day:"Day 29",title:"Idioms — learn 20 common idioms",skill:"Vocabulary",mins:35,desc:"Idioms make you sound natural and memorable. 'Break a leg', 'hit the nail on the head', 'bite the bullet'. Learn 20 idioms with context sentences and use 5 in conversation today.",resources:[{label:"Common English Idioms — Idioms Online",url:"https://www.idioms.online/",type:"Web"},{label:"20 Must-Know English Idioms (YouTube)",url:"https://www.youtube.com/watch?v=HkRqbgHLBbE",type:"YT"},{label:"Idioms Dictionary — The Free Dictionary",url:"https://idioms.thefreedictionary.com/",type:"Tool"}]},
+  {phase:"Phase 2",day:"Day 30",title:"Phase 2 Review + write a 300-word personal essay",skill:"Writing",mins:55,desc:"Write a 300-word essay on 'My Career Goals'. Use: past tense (background), present tense (current situation), future tense (goals), modal verbs, conditionals, and connectors.",resources:[{label:"How to Write a Personal Essay",url:"https://www.grammarly.com/blog/how-to-write-a-personal-essay/",type:"Blog"},{label:"Personal Statement Writing Tips (YouTube)",url:"https://www.youtube.com/watch?v=jRMkRaQ9Ai4",type:"YT"}]},
+
+  // ===== PHASE 3: SPEAKING CONFIDENCE (Days 31–45) =====
+  {phase:"Phase 3",day:"Day 31",title:"Reported speech: 'He said that...'",skill:"Grammar",mins:35,desc:"'He said he was tired' (not 'He said he is tired'). Backshift of tenses in reported speech. Essential for professional conversations, interviews, and storytelling.",resources:[{label:"Reported Speech Guide — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/reported-speech",type:"Web"},{label:"Reported Speech Made Simple (YouTube)",url:"https://www.youtube.com/watch?v=5YSWU7lJDdg",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 32",title:"Intonation patterns — questions vs statements",skill:"Speaking",mins:30,desc:"Rising intonation for yes/no questions, falling for wh-questions and statements. Wrong intonation makes you sound rude or confused. Practice 10 sentences with exaggerated intonation.",resources:[{label:"English Intonation — British Council",url:"https://www.bbc.co.uk/learningenglish/english/features/pronunciation/intonation",type:"Web"},{label:"English Intonation Tutorial (YouTube)",url:"https://www.youtube.com/watch?v=TUxAVJSv3R8",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 33",title:"Technical English — explain your work in simple terms",skill:"Speaking",mins:40,desc:"As a developer, you must explain technical concepts clearly in English. Practice explaining: 'What is an API?', 'What is a database?', 'What did you build at your last job?' — to a non-technical listener.",resources:[{label:"Tech English for Professionals",url:"https://www.bbc.co.uk/learningenglish/english/features/the-english-we-speak",type:"Web"},{label:"How to Explain Tech Simply (YouTube)",url:"https://www.youtube.com/watch?v=GiHBDBjJrAI",type:"YT"},{label:"Simple Wikipedia — Read Tech Articles Simply",url:"https://simple.wikipedia.org/",type:"Web"}]},
+  {phase:"Phase 3",day:"Day 34",title:"Relative clauses: who, which, that, where",skill:"Grammar",mins:35,desc:"'The developer who built this app is talented.' 'The book that I read was fascinating.' Relative clauses let you combine ideas and sound sophisticated.",resources:[{label:"Relative Clauses — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/relative-clauses",type:"Web"},{label:"Relative Clauses Explained (YouTube)",url:"https://www.youtube.com/watch?v=6F-nQ8-3IfM",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 35",title:"Mock job interview in English — 20 minutes",skill:"Speaking",mins:50,desc:"Record yourself answering these questions: Tell me about yourself. What are your strengths? Describe a challenge you overcame. Where do you see yourself in 5 years? Use STAR method for answers.",resources:[{label:"STAR Method Explained",url:"https://www.themuse.com/advice/star-interview-method",type:"Blog"},{label:"Common Interview Questions (YouTube)",url:"https://www.youtube.com/watch?v=OqTmqVZTCkw",type:"YT"},{label:"English for Job Interviews — BBC",url:"https://www.bbc.co.uk/learningenglish/english/features/english-at-work",type:"Web"}]},
+  {phase:"Phase 3",day:"Day 36",title:"Gerunds vs infinitives: 'enjoy doing' vs 'want to do'",skill:"Grammar",mins:35,desc:"'I enjoy working' (gerund) vs 'I want to work' (infinitive). Some verbs take gerunds, some take infinitives, some both. There's no logic — you must memorize the lists.",resources:[{label:"Gerunds vs Infinitives — Perfect English Grammar",url:"https://www.perfect-english-grammar.com/gerunds-and-infinitives.html",type:"Web"},{label:"Gerund vs Infinitive (YouTube)",url:"https://www.youtube.com/watch?v=6WiHABFJyCs",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 37",title:"Read an English blog post and comment on it",skill:"Reading",mins:35,desc:"Read a tech or general article (Medium, HackerNoon, The Guardian). Write a 3-sentence comment or response. Reading with intention to respond forces you to understand more deeply.",resources:[{label:"The Guardian — World News",url:"https://www.theguardian.com/international",type:"Web"},{label:"HackerNoon — Tech Articles",url:"https://hackernoon.com/",type:"Web"},{label:"Medium — Personal Development",url:"https://medium.com/topic/self-improvement",type:"Web"}]},
+  {phase:"Phase 3",day:"Day 38",title:"Phrasal verbs in professional context",skill:"Vocabulary",mins:35,desc:"Learn 20 professional/office phrasal verbs: 'follow up', 'reach out', 'bring up', 'carry out', 'set up', 'take over', 'wrap up'. Use each in a professional sentence.",resources:[{label:"Business Phrasal Verbs — English Club",url:"https://www.englishclub.com/vocabulary/phrasal-verbs-business.php",type:"Web"},{label:"Workplace Phrasal Verbs (YouTube)",url:"https://www.youtube.com/watch?v=GfJ8cxjQ5xU",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 39",title:"Telephone and meeting English",skill:"Speaking",mins:40,desc:"'I'm calling regarding...', 'Could you repeat that?', 'I'd like to discuss...', 'Let's circle back on...'. Practice 20 meeting/call phrases. This is immediately useful in your tech job.",resources:[{label:"English for Meetings — BBC Learning",url:"https://www.bbc.co.uk/learningenglish/english/features/english-at-work",type:"Web"},{label:"Meeting English Phrases (YouTube)",url:"https://www.youtube.com/watch?v=r0EGCrMMUKA",type:"YT"},{label:"Business English Pod — Free Podcast",url:"https://www.businessenglishpod.com/",type:"Podcast"}]},
+  {phase:"Phase 3",day:"Day 40",title:"Debate with yourself — argue both sides of a topic",skill:"Speaking",mins:35,desc:"Choose any topic: 'Remote work is better than office work'. Speak for 3 minutes FOR it, then 3 minutes AGAINST it. This forces you to think in English and build arguments.",resources:[{label:"English Debate Phrases and Vocabulary",url:"https://www.fluentu.com/blog/english/english-debate-phrases/",type:"Blog"},{label:"Discussion and Debate Language (YouTube)",url:"https://www.youtube.com/watch?v=EEQYxLPKyJQ",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 41",title:"Narrative tenses — tell a story in past tense",skill:"Grammar",mins:40,desc:"'I was walking home (past continuous — background) when suddenly someone called me (past simple — main event). I had never seen her before (past perfect — earlier event).' Master storytelling tenses.",resources:[{label:"Narrative Tenses — British Council",url:"https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar/past-perfect",type:"Web"},{label:"How to Tell Stories in English (YouTube)",url:"https://www.youtube.com/watch?v=KNGfOSMNLno",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 42",title:"Expand listening: podcast at 1.25x speed",skill:"Listening",mins:35,desc:"If you can understand at normal speed, bump it to 1.25x. This forces your brain to process faster, which is closer to natural conversation speed. Use Lex Fridman or Tim Ferriss podcast.",resources:[{label:"Lex Fridman Podcast",url:"https://lexfridman.com/podcast/",type:"Podcast"},{label:"Ted Talks (Start with subtitles, then remove)",url:"https://www.ted.com/talks",type:"Web"},{label:"How to Improve Listening Speed (YouTube)",url:"https://www.youtube.com/watch?v=_IrdFjVOESY",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 43",title:"Write a technical blog post in English (500 words)",skill:"Writing",mins:60,desc:"Write a 500-word post about a technical topic you know well (Django, FastAPI, Python, databases). Explain it for a general audience. Post on Medium or Dev.to — real audience improves commitment.",resources:[{label:"Dev.to — Developer Blogging Platform",url:"https://dev.to/",type:"Platform"},{label:"How to Write Technical Content — Smashing Magazine",url:"https://www.smashingmagazine.com/2021/07/tips-writing-technical-content/",type:"Blog"},{label:"Hemingway Editor — Simplify Your Writing",url:"https://hemingwayapp.com/",type:"Tool"}]},
+  {phase:"Phase 3",day:"Day 44",title:"Collocations with make, do, take, have, get",skill:"Vocabulary",mins:35,desc:"'Make a mistake' NOT 'do a mistake'. 'Have a meeting', 'get a promotion', 'take a break'. These 5 verbs combine with hundreds of nouns. Mastering them removes your #1 vocabulary crutch.",resources:[{label:"Collocations with MAKE vs DO",url:"https://www.englishclub.com/vocabulary/collocations-make-do.php",type:"Web"},{label:"Make Do Have Get Take (YouTube)",url:"https://www.youtube.com/watch?v=SXoMcTL3hNM",type:"YT"}]},
+  {phase:"Phase 3",day:"Day 45",title:"Phase 3 Review + Toastmasters-style 2-min speech",skill:"Speaking",mins:50,desc:"Prepare and deliver a 2-minute speech on 'Why I am learning English'. Time yourself. Use: an opening hook, 3 main points, a strong closing. Record and upload as private YouTube video to review.",resources:[{label:"Toastmasters Speech Structure",url:"https://www.toastmasters.org/resources/public-relations/speechwriting-guide",type:"Web"},{label:"How to Structure a Short Speech (YouTube)",url:"https://www.youtube.com/watch?v=KqORm5MRyuY",type:"YT"}]},
+
+  // ===== PHASE 4: NATIVE-LIKE EXPRESSION (Days 46–60) =====
+  {phase:"Phase 4",day:"Day 46",title:"Advanced vocabulary: formal register vs informal",skill:"Vocabulary",mins:40,desc:"'Ask' vs 'Enquire'. 'Use' vs 'Utilize'. 'Help' vs 'Facilitate'. Learn 30 formal equivalents of common informal words. Professional English requires register awareness.",resources:[{label:"Formal vs Informal Vocabulary List",url:"https://www.oxfordonlineenglish.com/formal-informal-vocabulary",type:"Web"},{label:"Formal vs Informal English (YouTube)",url:"https://www.youtube.com/watch?v=M7XUKW8PtH0",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 47",title:"Discourse markers: well, right, actually, basically",skill:"Speaking",mins:30,desc:"These small words are what native speakers say all the time: 'Well, I think...', 'Actually, you know what...', 'So basically...'. They buy thinking time and signal shifts in conversation.",resources:[{label:"Discourse Markers in English",url:"https://www.bbc.co.uk/learningenglish/english/features/pronunciation/discourse-markers",type:"Web"},{label:"Sound Like a Native: Discourse Markers (YouTube)",url:"https://www.youtube.com/watch?v=gQVrAuFBSx0",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 48",title:"Participate in an online English discussion forum",skill:"Writing",mins:40,desc:"Join Reddit (r/learnprogramming or any hobby subreddit). Write 3 meaningful comments or reply to 2 posts. Real asynchronous communication is very different from exercises.",resources:[{label:"Reddit — r/learnprogramming",url:"https://www.reddit.com/r/learnprogramming/",type:"Community"},{label:"Stack Overflow — Ask or Answer a Question",url:"https://stackoverflow.com/",type:"Community"},{label:"Hacker News — Join Discussion",url:"https://news.ycombinator.com/",type:"Community"}]},
+  {phase:"Phase 4",day:"Day 49",title:"Cleft sentences and emphasis",skill:"Grammar",mins:35,desc:"'What I want is clarity.' 'It was John who called.' 'The reason I'm here is to improve.' Cleft sentences add emphasis and sophistication. Very common in formal speech.",resources:[{label:"Cleft Sentences — British Council",url:"https://learnenglish.britishcouncil.org/grammar/c1-grammar/cleft-sentences",type:"Web"},{label:"Cleft Sentences for Emphasis (YouTube)",url:"https://www.youtube.com/watch?v=VEmYmhVD3YY",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 50",title:"Speed listening: a TED Talk without subtitles",skill:"Listening",mins:40,desc:"Pick a TED Talk (18 min). Watch it ONCE with no subtitles. Write everything you understood — aim for 70%+. If you get less, watch again. Check transcript after. Push your listening ceiling.",resources:[{label:"TED Talks — Browse by Topic",url:"https://www.ted.com/talks",type:"Web"},{label:"Best TED Talks for English Learners",url:"https://www.fluentu.com/blog/english/best-ted-talks-for-english-learners/",type:"Blog"}]},
+  {phase:"Phase 4",day:"Day 51",title:"Reduced speech: gonna, wanna, gotta, hafta",skill:"Listening",mins:30,desc:"Native speakers don't say 'going to' — they say 'gonna'. 'Want to' → 'wanna'. 'Have to' → 'hafta'. If you don't know these, you'll misunderstand 30% of natural speech.",resources:[{label:"Reduced English Pronunciation — Rachel's English",url:"https://rachelsenglish.com/",type:"Web"},{label:"American English Reduced Forms (YouTube)",url:"https://www.youtube.com/watch?v=Y1sKgKZGrSQ",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 52",title:"Write a LinkedIn post about a technical achievement",skill:"Writing",mins:45,desc:"Write a professional LinkedIn-style post (200-300 words) about something you built or learned at work. Use: achievement statement, context, impact, lesson. This builds your professional English voice.",resources:[{label:"LinkedIn Post Writing Tips",url:"https://www.linkedin.com/business/marketing/blog/content-marketing/linkedin-content-tips",type:"Blog"},{label:"How to Write a Great LinkedIn Post (YouTube)",url:"https://www.youtube.com/watch?v=cKVaRXp9UzU",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 53",title:"Hedging language — be diplomatic in English",skill:"Speaking",mins:35,desc:"'It might be the case that...', 'I could be wrong but...', 'From my perspective...', 'It seems to me that...'. Hedging is critical for diplomacy in English — overconfidence sounds rude.",resources:[{label:"Hedging in Academic and Professional English",url:"https://www.oxfordonlineenglish.com/hedging-language",type:"Web"},{label:"Hedging Language for Polite English (YouTube)",url:"https://www.youtube.com/watch?v=xGF0o7Jnzlw",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 54",title:"Subjunctive mood: I wish, if only, it's important that",skill:"Grammar",mins:35,desc:"'I wish I were taller' (not 'was'). 'It's essential that he be here' (formal). 'If only I had studied harder.' The subjunctive makes you sound educated and careful.",resources:[{label:"Subjunctive Mood — British Council",url:"https://learnenglish.britishcouncil.org/grammar/c1-grammar/subjunctive",type:"Web"},{label:"English Subjunctive Explained (YouTube)",url:"https://www.youtube.com/watch?v=3S7eCHpn8v4",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 55",title:"Conduct a full English meeting with a partner",skill:"Speaking",mins:45,desc:"Simulate a 30-minute work meeting: project status update, raise a concern, give feedback, close with action items. Either with a HelloTalk partner or record both 'voices' yourself.",resources:[{label:"How to Run Effective Meetings in English",url:"https://www.businessenglishpod.com/2007/04/01/bep-5-making-suggestions-in-meetings/",type:"Podcast"},{label:"Meeting Phrases — English at Work BBC",url:"https://www.bbc.co.uk/learningenglish/english/features/english-at-work",type:"Web"}]},
+  {phase:"Phase 4",day:"Day 56",title:"Advanced reading: an opinion essay from The Economist",skill:"Reading",mins:40,desc:"The Economist uses complex but clean English. Read one article and: look up 5 unknown words, identify 3 hedging phrases, note the structure of the argument. This is C1-level reading.",resources:[{label:"The Economist — Free Articles",url:"https://www.economist.com/free",type:"Web"},{label:"How to Read The Economist (YouTube)",url:"https://www.youtube.com/watch?v=IyDzKOFdB7o",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 57",title:"Sarcasm and humour in English",skill:"Vocabulary",mins:30,desc:"English humour often involves understatement and sarcasm. 'Oh great, another Monday.' Learn the patterns: understatement, dry humour, self-deprecation. This is the hardest cultural skill.",resources:[{label:"British vs American Humor Explained (YouTube)",url:"https://www.youtube.com/watch?v=ZRMH9ZZKS4c",type:"YT"},{label:"English Sarcasm and Irony",url:"https://www.fluentu.com/blog/english/sarcasm-in-english/",type:"Blog"}]},
+  {phase:"Phase 4",day:"Day 58",title:"Presentations: opening hook, structure, closing",skill:"Speaking",mins:50,desc:"'Did you know that...' (statistic hook). Three clear points. 'In conclusion, what I'd like you to take away is...' Prepare a 5-minute presentation on any technical topic and deliver it.",resources:[{label:"Presentation English — British Council",url:"https://www.bbc.co.uk/learningenglish/english/features/english-at-work/ep-16",type:"Web"},{label:"How to Give a Great Presentation (YouTube)",url:"https://www.youtube.com/watch?v=Unzc731iCUY",type:"YT"},{label:"Presentation Language and Phrases",url:"https://www.oxfordonlineenglish.com/presentation-language",type:"Web"}]},
+  {phase:"Phase 4",day:"Day 59",title:"Edit and polish your Phase 3 technical blog post",skill:"Writing",mins:45,desc:"Take your 500-word technical post from Day 43. Revise it using: Hemingway Editor (simplify), Grammarly (grammar), read aloud (rhythm). A great writer edits 3x more than they write.",resources:[{label:"Hemingway Editor",url:"https://hemingwayapp.com/",type:"Tool"},{label:"Grammarly",url:"https://www.grammarly.com/",type:"Tool"},{label:"Self-Editing Tips for Non-Native Writers (YouTube)",url:"https://www.youtube.com/watch?v=P_RqeB_m1mM",type:"YT"}]},
+  {phase:"Phase 4",day:"Day 60",title:"🎓 Final Day: Full fluency evaluation + celebrate!",skill:"Speaking",mins:60,desc:"Record a 15-minute video: introduce yourself, describe your career, explain one technical concept, discuss a recent news story, and give your reflections on the 60-day journey. Compare to your Day 15 recording. You've come far. 🎉",resources:[{label:"CEFR Self-Assessment Grid",url:"https://www.coe.int/en/web/portfolio/self-assessment-grid",type:"Web"},{label:"Free English Level Test — EF",url:"https://www.ef.com/wwen/english-testing/",type:"Tool"},{label:"Your 60-Day Review: What Next?",url:"https://www.fluentu.com/blog/english/english-fluency-after-learning/",type:"Blog"}]},
+];
+
+const STORAGE_KEY = 'fluentpath_v1';
+let progress = {};
+let filters = { phase: 'all', skill: 'all', status: 'all', search: '' };
+
+function load() { try { progress = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}'); } catch(e) { progress = {}; } }
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(progress)); }
+function getItem(i) { return progress[i] || { status: 'To Do', d1: false, d2: false, d3: false }; }
+function setItem(i, k, v) { if (!progress[i]) progress[i] = { status: 'To Do', d1: false, d2: false, d3: false }; progress[i][k] = v; save(); updateStats(); }
+
+function updateStats() {
+  const done = Object.values(progress).filter(v => v.status === 'Done').length;
+  const total = TASKS.length;
+  const pct = Math.round((done / total) * 100);
+  document.getElementById('done-count').textContent = done;
+  document.getElementById('total-count').textContent = total;
+  document.getElementById('pct-text').textContent = pct + '%';
+  document.getElementById('pct-fill-text').textContent = pct + '%';
+  document.getElementById('main-progress').style.width = pct + '%';
+  // streak (consecutive done from day 1)
+  let streak = 0;
+  for (let i = 0; i < TASKS.length; i++) {
+    if (getItem(i).status === 'Done') streak++;
+    else break;
+  }
+  document.getElementById('streak-count').textContent = streak;
+}
+
+const skillBadge = s => {
+  const map = { Grammar: 'badge-grammar', Vocabulary: 'badge-vocab', Speaking: 'badge-speaking', Listening: 'badge-listening', Reading: 'badge-reading', Writing: 'badge-writing' };
+  return `<span class="badge ${map[s]||'badge-daily'}">${s}</span>`;
+};
+const phaseColor = p => ({ 'Phase 1': '#58a6ff', 'Phase 2': '#bc8cff', 'Phase 3': '#3fb950', 'Phase 4': '#f0883e' }[p] || '#58a6ff');
+const rtypeBadge = t => {
+  const map = { Blog:'📝', YT:'▶️', Web:'🌐', Podcast:'🎧', Tool:'🔧', App:'📱', Platform:'🚀', Community:'💬' };
+  return map[t] || '🔗';
+};
+
+function renderCards() {
+  const container = document.getElementById('cards-container');
+  const s = filters.search.toLowerCase();
+  container.innerHTML = '';
+  const phases = ['Phase 1', 'Phase 2', 'Phase 3', 'Phase 4'];
+  let totalShowing = 0;
+
+  phases.forEach(phase => {
+    if (filters.phase !== 'all' && filters.phase !== phase) return;
+    const items = TASKS.map((t, i) => ({...t, idx: i})).filter(t => {
+      if (t.phase !== phase) return false;
+      if (filters.skill !== 'all' && t.skill !== filters.skill) return false;
+      const p = getItem(t.idx);
+      if (filters.status !== 'all' && p.status !== filters.status) return false;
+      if (s && !t.title.toLowerCase().includes(s) && !t.day.toLowerCase().includes(s) && !t.skill.toLowerCase().includes(s) && !t.desc.toLowerCase().includes(s)) return false;
+      return true;
+    });
+    if (items.length === 0) return;
+    totalShowing += items.length;
+    const done = items.filter(t => getItem(t.idx).status === 'Done').length;
+    const pct = Math.round((done / items.length) * 100);
+    const color = phaseColor(phase);
+    const subtitles = {'Phase 1':'Beginner Foundation — Grammar, Basic Vocab, First Conversations','Phase 2':'Building Fluency — Advanced Grammar, Phrasal Verbs, Writing','Phase 3':'Speaking Confidence — Mock Interviews, Debates, Professional English','Phase 4':'Native-like Expression — Advanced Vocab, Nuance, Real-world Use'};
+    const days = {'Phase 1':'Days 1–15','Phase 2':'Days 16–30','Phase 3':'Days 31–45','Phase 4':'Days 46–60'};
+    const group = document.createElement('div');
+    group.className = 'phase-group';
+    group.innerHTML = `
+      <div class="phase-header" onclick="togglePhase(this)">
+        <div class="phase-dot" style="background:${color}"></div>
+        <div style="flex:1;min-width:0">
+          <div class="phase-title" style="color:${color}">${phase}</div>
+          <div class="phase-subtitle">${subtitles[phase]}</div>
+        </div>
+        <span class="phase-days">${days[phase]}</span>
+        <div class="phase-prog-bar"><div class="phase-prog-fill" style="width:${pct}%;background:${color}"></div></div>
+        <span class="phase-count">${done}/${items.length} · ${pct}%</span>
+        <span class="phase-toggle">▼</span>
+      </div>
+      <div class="tasks-list"></div>
+    `;
+    const list = group.querySelector('.tasks-list');
+    items.forEach(item => {
+      const prog = getItem(item.idx);
+      const card = document.createElement('div');
+      card.className = 'task-card' + (prog.status === 'Done' ? ' t-done' : '');
+      const sc = prog.status === 'Done' ? 's-done' : prog.status === 'In Progress' ? 's-prog' : '';
+      card.innerHTML = `
+        <div class="task-top" onclick="toggleTask(this)">
+          <span class="task-num">${String(item.idx+1).padStart(2,'0')}</span>
+          <div class="task-main">
+            <div class="task-day">${item.day}</div>
+            <div class="task-title">${item.title}</div>
+            <div class="task-badges">
+              ${skillBadge(item.skill)}
+              <span class="badge badge-mins">⏱ ${item.mins}min</span>
+              <span class="badge badge-daily">${item.phase}</span>
+            </div>
+          </div>
+          <span class="task-expand">▼</span>
+        </div>
+        <div class="task-body">
+          <div class="task-desc">📌 ${item.desc}</div>
+          ${item.resources && item.resources.length ? `
+            <div class="task-resources">
+              <div class="res-label">📚 Resources</div>
+              <div class="res-links">
+                ${item.resources.map(r=>`<a href="${r.url}" target="_blank" class="res-link"><span class="rtype">${rtypeBadge(r.type)} ${r.type}</span> ${r.label}</a>`).join('')}
+              </div>
+            </div>` : ''}
+          <div class="task-actions">
+            <select class="status-sel ${sc}" onchange="onStatus(${item.idx},this)">
+              <option ${prog.status==='To Do'?'selected':''}>To Do</option>
+              <option ${prog.status==='In Progress'?'selected':''}>In Progress</option>
+              <option ${prog.status==='Done'?'selected':''}>Done</option>
+              <option ${prog.status==='Skip'?'selected':''}>Skip</option>
+            </select>
+            <div class="streak-btns">
+              <button class="streak-btn ${prog.d1?'s-done':''}" onclick="toggleDay(${item.idx},1,event)">✓ D1</button>
+              <button class="streak-btn ${prog.d2?'s-done':''}" onclick="toggleDay(${item.idx},2,event)">✓ D2</button>
+              <button class="streak-btn ${prog.d3?'s-done':''}" onclick="toggleDay(${item.idx},3,event)">✓ D3</button>
+            </div>
+          </div>
+        </div>
+      `;
+      list.appendChild(card);
+    });
+    container.appendChild(group);
+  });
+  document.getElementById('no-results').style.display = totalShowing === 0 ? 'block' : 'none';
+}
+
+function togglePhase(h) { h.parentElement.classList.toggle('collapsed'); }
+function toggleTask(top) { top.parentElement.classList.toggle('expanded'); }
+function onStatus(idx, sel) {
+  const v = sel.value;
+  sel.className = 'status-sel' + (v==='Done'?' s-done':v==='In Progress'?' s-prog':'');
+  setItem(idx, 'status', v);
+  renderCards();
+}
+function toggleDay(idx, n, e) {
+  e.stopPropagation();
+  const k = 'd' + n;
+  const curr = getItem(idx)[k];
+  setItem(idx, k, !curr);
+  e.target.classList.toggle('s-done', !curr);
+}
+
+document.querySelector('.filters').addEventListener('click', e => {
+  const btn = e.target.closest('.fbtn');
+  if (!btn) return;
+  const g = btn.dataset.filter;
+  if (!g) return;
+  document.querySelectorAll(`[data-filter="${g}"]`).forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  filters[g] = btn.dataset.value;
+  renderCards();
+});
+
+document.getElementById('search').addEventListener('input', e => { filters.search = e.target.value; renderCards(); });
+
+load(); renderCards(); updateStats();
+</script>
+</body>
+</html>
